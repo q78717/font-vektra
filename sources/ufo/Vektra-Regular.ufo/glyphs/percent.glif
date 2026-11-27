@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="percent" format="2">
+  <advance width="696"/>
+  <unicode hex="0025"/>
+  <outline>
+    <contour>
+      <point x="638" y="184"/>
+      <point x="562" y="260"/>
+      <point x="454" y="260"/>
+      <point x="378" y="184"/>
+      <point x="378" y="76"/>
+      <point x="454" y="0"/>
+      <point x="562" y="0"/>
+      <point x="638" y="76"/>
+    </contour>
+    <contour>
+      <point x="318" y="624"/>
+      <point x="242" y="700"/>
+      <point x="134" y="700"/>
+      <point x="58" y="624"/>
+      <point x="58" y="516"/>
+      <point x="134" y="440"/>
+      <point x="242" y="440"/>
+      <point x="318" y="516"/>
+    </contour>
+    <contour>
+      <point x="83" y="17" type="line"/>
+      <point x="133" y="-17" type="line"/>
+      <point x="613" y="683" type="line"/>
+      <point x="563" y="717" type="line"/>
+    </contour>
+    <contour>
+      <point x="258" y="541"/>
+      <point x="217" y="500"/>
+      <point x="159" y="500"/>
+      <point x="118" y="541"/>
+      <point x="118" y="599"/>
+      <point x="159" y="640"/>
+      <point x="217" y="640"/>
+      <point x="258" y="599"/>
+    </contour>
+    <contour>
+      <point x="578" y="101"/>
+      <point x="537" y="60"/>
+      <point x="479" y="60"/>
+      <point x="438" y="101"/>
+      <point x="438" y="159"/>
+      <point x="479" y="200"/>
+      <point x="537" y="200"/>
+      <point x="578" y="159"/>
+    </contour>
+  </outline>
+</glyph>

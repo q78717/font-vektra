@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vektra Specimen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+@font-face { font-family: "Vektra"; src: url(data:font/woff2;base64,__FONT_REGULAR__) format("woff2"); font-display: block; }
+
+:root {
+  /* rv site palette: darknavy #0d1b2a, offwhite #f5f3ee, denim #3b5b8c, red #d72638 */
+  --paper: #f5f3ee;
+  --panel: #ffffff;
+  --ink: #0d1b2a;
+  --muted: rgba(13, 27, 42, 0.68);
+  --rule: rgba(13, 27, 42, 0.14);
+  --denim: #3b5b8c;
+  --red: #d72638;
+  --f-display: "Vektra", "IBM Plex Sans", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.75rem;
+  --measure: 62ch;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1b2a; --panel: #13263a; --ink: #f5f3ee; --muted: rgba(245, 243, 238, 0.70);
+    --rule: rgba(245, 243, 238, 0.14); --denim: #8fb0e0; --red: #d72638; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1b2a; --panel: #13263a; --ink: #f5f3ee; --muted: rgba(245, 243, 238, 0.70);
+  --rule: rgba(245, 243, 238, 0.14); --denim: #8fb0e0; --red: #d72638; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+section, header, footer { padding-block: clamp(40px, 6vw, 72px); }
+section + section { border-top: 1px solid var(--rule); }
+h2 {
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: var(--step--1);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0 0 8px;
+}
+.sub { font-size: var(--step-1); margin: 0 0 28px; max-width: var(--measure); text-wrap: balance; }
+.mono { font-family: var(--f-mono); }
+
+/* ---------- header ---------- */
+header { padding-bottom: 32px; }
+.eyebrow {
+  font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin: 0;
+}
+h1.display {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(72px, 15vw, 190px);
+  line-height: 1.08;
+  margin: 12px 0 8px;
+  letter-spacing: 0.02em;
+  font-kerning: normal;
+}
+.lede { font-size: var(--step-1); max-width: 48ch; margin: 0 0 32px; text-wrap: balance; }
+.specs {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0; margin: 0; border-top: 1px solid var(--rule); border-left: 1px solid var(--rule);
+}
+.specs div { padding: 12px 14px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.specs dt { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.specs dd { margin: 2px 0 0; font-family: var(--f-mono); font-size: var(--step-1); font-variant-numeric: tabular-nums; }
+
+/* ---------- construction ---------- */
+.bench { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); align-items: start; }
+@media (max-width: 860px) { .bench { grid-template-columns: 1fr; } }
+.drawing { background: var(--panel); border: 1px solid var(--rule); }
+.drawing svg { display: block; width: 100%; height: auto; max-width: 100%; aspect-ratio: 1; }
+.readout {
+  display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; justify-content: space-between;
+  padding: 12px 16px; border-top: 1px solid var(--rule); font-family: var(--f-mono); font-size: var(--step--1);
+}
+.readout b { font-weight: 500; color: var(--ink); }
+.readout span { color: var(--muted); }
+.toggles { display: flex; flex-wrap: wrap; gap: 14px; }
+.toggles label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; color: var(--ink); }
+.toggles input { accent-color: var(--red); margin: 0; }
+
+.g-guide { fill: none; stroke: var(--denim); stroke-width: 2.5; stroke-dasharray: 8 8; opacity: 0.65; }
+.g-band { stroke: var(--denim); stroke-width: 2; stroke-dasharray: 10 10; opacity: 0.7; }
+.g-base { stroke: var(--red); stroke-width: 2.5; opacity: 0.8; }
+.g-fill { fill: var(--ink); opacity: 0.9; }
+.g-skel { fill: none; stroke: var(--red); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.g-label { font-family: var(--f-mono); font-size: 22px; fill: var(--muted); letter-spacing: 0.06em; }
+
+.set { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 4px; max-height: 580px; overflow-y: auto; padding-right: 4px; }
+.cell {
+  appearance: none; border: 1px solid transparent; background: transparent; color: var(--ink);
+  padding: 4px 2px 2px; cursor: pointer; display: grid; justify-items: center; gap: 0; border-radius: 2px;
+}
+.cell svg { width: 100%; max-width: 60px; aspect-ratio: 1; height: auto; display: block; }
+.cell svg line { stroke: var(--rule); stroke-width: 12; }
+.cell svg path { fill: currentColor; }
+.cell span { font-family: var(--f-mono); font-size: 0.68rem; color: var(--muted); line-height: 1.4; }
+.cell:hover { background: var(--panel); }
+.cell[aria-pressed="true"] { border-color: var(--red); background: var(--panel); }
+.cell:focus-visible, button:focus-visible, input:focus-visible, .tester-text:focus-visible { outline: 2px solid var(--denim); outline-offset: 2px; }
+.set-note { font-size: var(--step--1); color: var(--muted); margin: 12px 0 0; max-width: var(--measure); }
+
+/* ---------- tester ---------- */
+.controls { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: center; margin-bottom: 20px; }
+.ctl { display: inline-flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: var(--step--1); }
+.ctl input[type="range"] { width: 160px; accent-color: var(--red); }
+.ctl output { min-width: 4ch; font-variant-numeric: tabular-nums; }
+.swatches { display: inline-flex; gap: 6px; }
+.swatches button {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--paper); outline: 1px solid var(--rule); cursor: pointer; padding: 0;
+}
+.swatches button[aria-pressed="true"] { outline: 2px solid var(--ink); }
+.sw-ink { background: var(--ink); } .sw-denim { background: var(--denim); } .sw-red { background: var(--red); }
+.textbtn { appearance: none; border: 0; background: none; color: var(--denim); font-family: var(--f-mono); font-size: var(--step--1); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 0; }
+.tester-text {
+  font-family: var(--f-display); font-size: 56px; line-height: 1.25; color: var(--ink);
+  min-height: 3em; padding: 16px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  overflow-wrap: anywhere; outline: none; font-kerning: normal; white-space: pre-wrap;
+}
+
+/* ---------- waterfall ---------- */
+.fall { display: grid; gap: 8px; }
+.fall div { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 14px; align-items: baseline; }
+.fall .px { font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fall .t { font-family: var(--f-display); white-space: nowrap; overflow: hidden; text-overflow: clip; line-height: 1.3; }
+
+/* ---------- get ---------- */
+.get { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; margin: 0 0 28px; }
+.get a { color: var(--ink); font-family: var(--f-mono); font-size: var(--step--1); }
+.get-btn { background: var(--ink); color: var(--paper) !important; padding: 9px 16px; text-decoration: none; }
+.get-btn:hover { background: var(--red); color: #f5f3ee !important; }
+.get a.get-src:hover { color: var(--red); }
+.get-src { text-decoration: underline; text-underline-offset: 3px; }
+.get-lic { font-size: var(--step--1); color: var(--muted); }
+footer a { color: inherit; }
+
+/* ---------- system notes ---------- */
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 36px; }
+.notes article { min-width: 0; }
+.notes h3 { font-family: var(--f-display); font-weight: 400; font-size: var(--step-2); margin: 0 0 6px; line-height: 1.3; }
+.notes p { margin: 0; max-width: var(--measure); }
+.notes .num { font-family: var(--f-mono); color: var(--denim); }
+
+footer { border-top: 1px solid var(--rule); font-family: var(--f-mono); font-size: var(--step--1); color: var(--muted); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 28px; justify-content: space-between; }
+</style>
+<style id="rv-theme-toggle">
+.rv-toggle { position: fixed; top: 16px; right: 16px; z-index: 50; width: 40px; height: 40px;
+  display: inline-flex; align-items: center; justify-content: center; border: none;
+  border-radius: 6px; background: var(--paper); color: var(--denim); cursor: pointer; }
+.rv-toggle:hover { color: var(--red); }
+.rv-toggle:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.rv-toggle svg { width: 20px; height: 20px; fill: currentColor; }
+.rv-toggle .sun { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .rv-toggle .sun { display: block; }
+  :root:not([data-theme="light"]) .rv-toggle .moon { display: none; }
+}
+:root[data-theme="dark"] .rv-toggle .sun { display: block; }
+:root[data-theme="dark"] .rv-toggle .moon { display: none; }
+/* Inside the q78717.github.io site header's toggle drives the theme. */
+.rv-embedded .rv-toggle { display: none; }
+</style>
+<script>
+(function () {
+  var r = document.documentElement;
+  if (window.self !== window.top) r.classList.add("rv-embedded");
+  else { try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") r.setAttribute("data-theme", t); } catch (e) {} }
+})();
+</script>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Typeface specimen &middot; version __VERSION__</p>
+    <h1 class="display">Vektra</h1>
+    <p class="lede">A minimal geometric sci-fi display typeface built from lines, angles, arcs, and triangles &mdash; one monoline stroke, sharp mitred apexes, and solid triangular dots, across Google Fonts&rsquo; Latin Core.</p>
+    <p class="get"><a class="get-btn" href="__REPO__/releases/latest">Download the fonts</a> <a class="get-src" href="__REPO__">Source on GitHub</a> <span class="get-lic">Free under the SIL Open Font License</span></p>
+    <dl class="specs" aria-label="Font specifications">
+      <div><dt>Characters</dt><dd id="sp-glyphs">__CHARS__</dd></div>
+      <div><dt>Units / em</dt><dd>1000</dd></div>
+      <div><dt>Cap / x-height</dt><dd>700 / 480</dd></div>
+      <div><dt>Stroke</dt><dd>60</dd></div>
+      <div><dt>Kern pairs</dt><dd id="sp-kern">__KERN__</dd></div>
+    </dl>
+  </div>
+</header>
+
+<section id="construction">
+  <div class="wrap">
+    <h2>Construction</h2>
+    <p class="sub">Pick any glyph to inspect its outline and the center-line skeleton of lines and true circular arcs it is expanded from.</p>
+    <div class="bench">
+      <figure class="drawing" style="margin:0">
+        <svg id="insp" viewBox="-260 -320 1080 1200" role="img" aria-labelledby="insp-title">
+          <title id="insp-title">Glyph construction drawing</title>
+          <g transform="translate(0, 880) scale(1,-1)">
+            <g id="guides">
+              <line class="g-guide" x1="-220" y1="700" x2="820" y2="700"></line>
+              <line class="g-band" x1="-220" y1="480" x2="820" y2="480"></line>
+              <line class="g-base" x1="-220" y1="0" x2="820" y2="0"></line>
+            </g>
+            <path id="ig" class="g-fill" d=""></path>
+            <path id="is" class="g-skel" d=""></path>
+          </g>
+          <g id="labels">
+            <text class="g-label" x="620" y="170">cap 700</text>
+            <text class="g-label" x="620" y="390">x-height 480</text>
+            <text class="g-label" x="620" y="870">baseline 0</text>
+          </g>
+        </svg>
+        <figcaption class="readout">
+          <div><b id="r-name">R</b> <span id="r-code">U+0052</span> &nbsp;<span id="r-count">3 strokes</span></div>
+          <div class="toggles">
+            <label><input type="checkbox" id="t-fill" checked> Outline</label>
+            <label><input type="checkbox" id="t-skel" checked> Skeleton</label>
+            <label><input type="checkbox" id="t-guide" checked> Guides</label>
+          </div>
+        </figcaption>
+      </figure>
+      <div>
+        <div class="set" id="set" role="group" aria-label="Glyph set"></div>
+        <p class="set-note">Red lines show the skeleton. Each one is offset by 30 units to either side with flat caps and mitred joins; arcs are offset concentrically, so curves stay exact.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tester">
+  <div class="wrap">
+    <h2>Type tester</h2>
+    <p class="sub">Type to test Vektra. Covers Google Fonts&rsquo; Latin Core: the Latin languages of Northern, Western, Central, and Eastern Europe.</p>
+    <div class="controls">
+      <label class="ctl" for="size">Size <input type="range" id="size" min="20" max="180" value="64"> <output id="size-out" for="size">64px</output></label>
+      <div class="ctl"><span>Ink</span>
+        <div class="swatches">
+          <button type="button" class="sw-ink" data-c="var(--ink)" aria-label="Navy ink" aria-pressed="true"></button>
+          <button type="button" class="sw-denim" data-c="var(--denim)" aria-label="Denim ink" aria-pressed="false"></button>
+          <button type="button" class="sw-red" data-c="var(--red)" aria-label="Red ink" aria-pressed="false"></button>
+        </div>
+      </div>
+      <label class="ctl" for="kern"><input type="checkbox" id="kern" checked style="accent-color:var(--red)"> Kerning</label>
+      <button type="button" class="textbtn" id="reset">Reset text</button>
+    </div>
+    <div class="tester-text" id="tt" contenteditable="plaintext-only" spellcheck="false" role="textbox" aria-multiline="true" aria-label="Type tester">Vektor 7 &middot; Orbital Station Ærø &middot; 2049
+Žluťoučký kůň &middot; Zażółć gęślą jaźń &middot; Ångström</div>
+  </div>
+</section>
+
+
+<section id="waterfall">
+  <div class="wrap">
+    <h2>Waterfall</h2>
+    <div class="fall" id="fall"></div>
+  </div>
+</section>
+
+<section id="system">
+  <div class="wrap">
+    <h2>The system</h2>
+    <div class="notes">
+      <article>
+        <h3>Lines, arcs &amp; triangles</h3>
+        <p>Every glyph is a skeleton of straight lines and true circular arcs. Bowls are full circles or stadiums; terminals are cut flat, square to the stroke.</p>
+      </article>
+      <article>
+        <h3>One monoline</h3>
+        <p>A single <span class="num">60</span>-unit stroke runs through capitals, lowercase, figures, and symbols. Joins are mitred up to a ratio of <span class="num">4</span>, so A, V, W, and M keep needle-sharp apexes.</p>
+      </article>
+      <article>
+        <h3>Triangular dots</h3>
+        <p>The period, colon, i and j dots, umlauts, and dot accents are solid triangles. Capitals stand <span class="num">700</span> units tall over a <span class="num">480</span>-unit x-height with <span class="num">720</span>-unit ascenders.</p>
+      </article>
+      <article>
+        <h3>Spacing &amp; kerning</h3>
+        <p>Every glyph gets <span class="num">58</span>-unit sidebearings. Class kerning (<span class="num">__KERN__</span> pairs) is measured from glyph profiles across all base and accented letters.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Vektra __VERSION__ &middot; SIL Open Font License 1.1 &middot; <a href="__REPO__">GitHub</a></span>
+    <span>Built programmatically with fontTools &amp; skia-pathops</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const DATA = __GLYPH_DATA__;
+  const NS = "http://www.w3.org/2000/svg";
+  const glyphs = DATA.glyphs;
+
+  const ig = document.getElementById("ig");
+  const is = document.getElementById("is");
+  const rName = document.getElementById("r-name");
+  const rCode = document.getElementById("r-code");
+  const rCount = document.getElementById("r-count");
+  const set = document.getElementById("set");
+  const cells = [];
+
+  function plural(n, w) { return n + " " + w + (n === 1 ? "" : "s"); }
+
+  function show(i) {
+    const g = glyphs[i];
+    const shift = 280 - g.cx;
+    ig.setAttribute("d", g.p);
+    ig.setAttribute("transform", "translate(" + shift + ",0)");
+    is.setAttribute("d", g.s);
+    is.setAttribute("transform", "translate(" + shift + ",0)");
+    rName.textContent = g.c;
+    rCode.textContent = "U+" + g.u.toString(16).toUpperCase().padStart(4, "0") + " " + g.n;
+    const parts = [plural(g.strokes, "stroke")];
+    if (g.dots) parts.push(plural(g.dots, "triangle dot"));
+    rCount.textContent = parts.join(" · ");
+    cells.forEach(function (b, j) { b.setAttribute("aria-pressed", j === i ? "true" : "false"); });
+  }
+
+  glyphs.forEach(function (g, i) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "cell";
+    b.setAttribute("aria-label", g.n);
+    b.setAttribute("aria-pressed", "false");
+    const svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "-160 -240 880 1120");
+    svg.setAttribute("aria-hidden", "true");
+    const baseLine = document.createElementNS(NS, "line");
+    baseLine.setAttribute("x1", "-100"); baseLine.setAttribute("y1", "840");
+    baseLine.setAttribute("x2", "660"); baseLine.setAttribute("y2", "840");
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d", g.p);
+    p.setAttribute("transform", "translate(" + (280 - g.cx) + ", 840) scale(1,-1)");
+    svg.append(baseLine, p);
+    const s = document.createElement("span");
+    s.textContent = g.c;
+    b.append(svg, s);
+    b.addEventListener("click", function () { show(i); });
+    set.appendChild(b);
+    cells.push(b);
+  });
+  const start = glyphs.findIndex(function (g) { return g.c === "R"; });
+  show(start < 0 ? 0 : start);
+
+  function bindToggle(id, el) {
+    const box = document.getElementById(id);
+    box.addEventListener("change", function () { el.style.opacity = box.checked ? "" : "0"; });
+  }
+  bindToggle("t-fill", ig);
+  bindToggle("t-skel", is);
+  const guideBox = document.getElementById("t-guide");
+  guideBox.addEventListener("change", function () {
+    const o = guideBox.checked ? "" : "0";
+    document.getElementById("guides").style.opacity = o;
+    document.getElementById("labels").style.opacity = o;
+  });
+
+  // ----- tester -----
+  const tt = document.getElementById("tt");
+  const DEFAULT_TEXT = tt.textContent;
+  const size = document.getElementById("size");
+  const sizeOut = document.getElementById("size-out");
+  function applySize() { tt.style.fontSize = size.value + "px"; sizeOut.textContent = size.value + "px"; }
+  size.addEventListener("input", applySize);
+  applySize();
+  document.querySelectorAll("#tester .swatches button").forEach(function (b, _, all) {
+    b.addEventListener("click", function () {
+      all.forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      tt.style.color = b.dataset.c;
+    });
+  });
+  document.getElementById("kern").addEventListener("change", function (e) {
+    tt.style.fontKerning = e.target.checked ? "normal" : "none";
+  });
+  document.getElementById("reset").addEventListener("click", function () { tt.textContent = DEFAULT_TEXT; });
+
+
+  // ----- waterfall -----
+  const fall = document.getElementById("fall");
+  [112, 72, 48, 36, 24, 18].forEach(function (px) {
+    const row = document.createElement("div");
+    const a = document.createElement("span"); a.className = "px"; a.textContent = px + "px";
+    const t = document.createElement("span"); t.className = "t"; t.style.fontSize = px + "px";
+    t.textContent = "VEKTRA: Orbital Station Ærø · Vector 2049 · Žluťoučký";
+    row.append(a, t);
+    fall.appendChild(row);
+  });
+})();
+</script>
+<script>
+// Light/dark toggle; when embedded in the q78717.github.io site, follow the wrapper's toggle instead.
+(function () {
+  var r = document.documentElement;
+  function effective() {
+    return r.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  }
+  var b = document.createElement("button");
+  b.className = "rv-toggle"; b.type = "button"; b.setAttribute("aria-label", "Toggle light and dark mode");
+  b.innerHTML = '<svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>';
+  b.addEventListener("click", function () {
+    var next = effective() === "dark" ? "light" : "dark";
+    r.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
+  });
+  document.body.appendChild(b);
+  window.addEventListener("message", function (e) {
+    if (e.origin !== "https://q78717.github.io" || !e.data || e.data.type !== "rv-theme") return;
+    var t = e.data.theme;
+    if (t === "light" || t === "dark") r.setAttribute("data-theme", t);
+    else r.removeAttribute("data-theme");
+  });
+  // Ask the wrapper for its theme once listening, so frame load timing can't drop it.
+  if (r.classList.contains("rv-embedded")) {
+    try { window.parent.postMessage({ type: "rv-theme-ready" }, "https://q78717.github.io"); } catch (e) {}
+  }
+})();
+</script>
+</body>
+</html>

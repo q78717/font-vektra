@@ -1,0 +1,13 @@
+venv/
+env/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+fb-*.html
+fb-*.md
+qa/
+*.hinted
+build.stamp
+out/
+venv-test/

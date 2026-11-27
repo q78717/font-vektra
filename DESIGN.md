@@ -1,42 +1,57 @@
 # Design — Vektra
 
 ## 1. Introduction
-Vektra is a minimalist geometric sci-fi typeface constructed from lines, angles, arcs, and triangles. Its technical philosophy is "Constructive Solid Geometry for Type": glyphs are described as polyline and arc skeletons, expanded into 2D polygon buffers with miter joins and flat caps, unioned via computational geometry, and compiled directly to TrueType.
+Vektra is a minimal geometric sci-fi display typeface built from lines, angles, arcs, and triangles. Its technical philosophy is **Constructive Solid Geometry for Type**. Each glyph is described as a skeleton of straight lines and true circular arcs. The skeleton is expanded into a monoline outline with flat caps and mitred joins, and the pieces are unioned with boolean path operations. The script writes a standard UFO source, which Google Fonts' `gftools builder` pipeline compiles.
 
 ## 2. Tech Stack
 - **Language**: Python 3.10+
-- **Computational Geometry**: `shapely` (geometric buffer operations, boolean polygon unions)
-- **Font Generation**: `fontTools` (`FontBuilder`, `TTGlyphPen`)
-- **Specimen**: HTML5, CSS3
+- **Outline Synthesis & Boolean Geometry**: `skia-pathops`, `fontTools`, `ufoLib2`, `numpy`
+- **Font Compilation & Hinting**: `gftools builder`, `fontmake`, `ufo2ft`, `ttfautohint-py`
+- **Quality Assurance**: `FontBakery` (`googlefonts` profile) / `fontspector`, `sources/tools/check_font.py`
+- **License**: SIL Open Font License 1.1 (`OFL.txt`)
 
 ## 3. Technical Architecture
-- **Skeleton-to-Polygon Pipeline**: Each character is represented as a skeletal wireframe (polylines and sampled arc segments).
-- **Geometric Buffering**: Wireframe lines are buffered using `shapely.geometry` with half the stroke weight (`SW = 30`), miter joins, and flat end-caps.
-- **Unary Union**: Multi-stroke overlapping polygons are dissolved into single unified boundary contours via `shapely.ops.unary_union`.
-- **TrueType Contour Emission**: Polygon exterior boundaries and holes are extracted, winding-corrected via `orient()`, and serialized to TTF glyph outlines via `TTGlyphPen`.
+- **Skeletons**: Glyphs are lists of strokes. A stroke mixes points and `Arc(cx, cy, r, a0, a1)` nodes, and consecutive nodes are joined by straight segments.
+- **Monoline Expansion** (`stroke_outline`): A line segment becomes a rectangle of width `W = 60` with flat caps. An arc becomes an annular sector, made from concentric arcs at `r ± 30`, so offsets are exact. Arcs are written as quadratic curves split every 45°, aligned to the axes, which gives every curve on-curve points at its extremes.
+- **Joins**: Where tangents change direction, a mitre wedge fills the outer gap. Wedges with a mitre ratio above `MITRE_LIMIT = 4` become bevels. Tangent line-to-arc joins need no wedge.
+- **Triangular Dots** (`G.tdot`): The period, colon, `i`/`j` dots, dieresis, and dot accents are solid triangles, 200 × 180 units at full size.
+- **Union & Cleanup**: Pieces are unioned with `skia-pathops`. Contours are then rounded, with tiny segments removed and colinear points merged, including across the contour start.
+- **Marks & Composites**: There are 16 combining marks with `_top`, `_bottom`, and `_ogonek` anchors. The 151 Latin Core composites are built as components. The `ccmp` feature swaps in dotless `i`/`j` before top marks, and `caroncomb.alt` serves `ď ľ ť Ľ`.
+- **Profile-Based Class Kerning**: `auto_kern()` measures scanline profiles of base glyphs and tightens pairs toward a gap of two sidebearings (about 4,500 pairs). It only tightens pairs, never loosens them.
 
-## 4. File Structure
+## 4. Repository Layout (Google Fonts Template)
 ```text
 font-vektra/
-├── vektra.py              # Computational geometry compiler and TTF synthesizer
-├── Vektra-Regular.ttf     # Compiled TrueType font
-└── vektra-specimen.html   # Interactive typography specimen and character map
+├── .github/workflows/            # CI build/test, GitHub Pages specimen, Release packaging
+├── AUTHORS.txt / CONTRIBUTORS.txt
+├── DESIGN.md                     # This document
+├── Makefile                      # build, test, qa, proof, images, update
+├── OFL.txt                       # SIL Open Font License 1.1
+├── README.md
+├── requirements.in / requirements.txt / requirements-qa.txt
+├── documentation/
+│   ├── article/                  # Google Fonts article & image
+│   ├── images/                   # README images
+│   └── specimen/index.html       # Self-contained interactive specimen
+├── fonts/
+│   ├── ttf/Vektra-Regular.ttf
+│   └── webfonts/Vektra-Regular.woff2
+└── sources/
+    ├── build.sh                  # Single-command build pipeline
+    ├── build_vektra.py           # Algorithmic UFO generator
+    ├── build_specimen.py         # Specimen compiler
+    ├── config.yaml               # gftools builder configuration
+    ├── specimen_template.html
+    ├── tools/                    # STAT builder, image renderer, font smoke test
+    └── ufo/Vektra-Regular.ufo    # Generated UFO source
 ```
 
-## 5. Implementation Details
-- **Grid Coordinates**: 1000 UPM grid, 700 Cap Height, 480 x-height, 720 Ascender, -200 Descender, 60-unit stroke weight, 58-unit sidebearing.
-- **Arc Sampling**: Trigonometric approximation of circular and elliptical curves (`arc(cx, cy, r, a0, a1, step=7.0)`).
-- **Glyph Coverage**: Full Latin uppercase, lowercase, figures (0-9), punctuation, and technical mathematical symbols.
+## 5. Metrics
+- 1000 UPM; cap height 700, x-height 480, ascender 720, descender −200.
+- Stroke 60 (accents 52); sidebearings 58 (40 for the period, comma, colon, semicolon, exclam, and straight quotes).
+- Line metrics are computed from the glyph bounds (currently 960 / −260) and kept at 1.2 em or more. `USE_TYPO_METRICS` is set.
 
-## 6. Build & Run
-- **Install Dependencies**: `pip install fonttools shapely`
-- **Build Font**: `python3 vektra.py`
-- **Preview**: Open `vektra-specimen.html` in any modern web browser.
-
-## 7. Tooling & Dependencies
-- `shapely`: C-based GEOS wrapper for robust 2D planar polygon buffering and unioning.
-- `fontTools`: OpenType table builder for TrueType binary generation.
-
-## 8. Security & Standards
-- Strictly adheres to TrueType specification contour winding requirements (outer contours clockwise, inner cutouts counter-clockwise).
-- Pure offline programmatic compilation with zero external network access.
+## 6. Build & QA Verification
+- **Build All Artifacts**: `make build` (or `./sources/build.sh`)
+- **Regenerate Documentation Images**: `make images`
+- **Google Fonts QA**: `make qa`. Both the `googlefonts` and `universal` profiles report 0 FAILs.
