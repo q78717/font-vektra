@@ -1,7 +1,7 @@
 name: Build font and specimen
 
-# Follows the googlefonts-project-template workflow: make build, make test
-# (fontspector, as used by Google Fonts), make proof (diffenator3).
+# make build, make test (fontspector, as used by Google Fonts) and make proof
+# (diffenator3), via the shared workflow in q78717/font-tools.
 
 on:
   workflow_dispatch:
@@ -11,54 +11,4 @@ on:
 
 jobs:
   build:
-    name: Build and test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v6
-        id: python
-        with:
-          python-version: "3.13"
-
-      - name: Setup fontspector
-        uses: fonttools/setup-fontspector@main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: cargo-bins/cargo-binstall@main
-        name: Install cargo binstall
-
-      - name: Install Rust font tools
-        run: cargo binstall --no-confirm diffenator3
-
-      - uses: actions/cache@v5
-        with:
-          path: ./venv/
-          key: ${{ runner.os }}-venv${{ steps.python.outputs.python-version }}-${{ hashFiles('**/requirements*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-venv${{ steps.python.outputs.python-version }}-
-
-      - name: Build font
-        run: make build
-
-      - name: Check with fontspector
-        run: make test
-        continue-on-error: true
-
-      - name: Add the fontspector reports to the run summary
-        if: always()
-        run: cat out/fontspector/*.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
-
-      - name: Generate proofs
-        run: make proof
-
-      - name: Archive artifacts
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: font-vektra-fonts
-          path: |
-            fonts
-            out
+    uses: q78717/font-tools/.github/workflows/build.yml@v0.1.0

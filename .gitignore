@@ -11,3 +11,4 @@ qa/
 build.stamp
 out/
 venv-test/
+.rvfont.mk

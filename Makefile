@@ -1,8 +1,21 @@
 # Follows the googlefonts-project-template Makefile. Vektra's source is generated
 # by sources/build_vektra.py, so `make build` runs sources/build.sh, which writes the
 # UFO and then runs gftools builder on sources/config.yaml.
-FAMILY=Vektra
-SOURCES=sources/build_vektra.py sources/build_specimen.py sources/specimen_template.html sources/tools/check_font.py $(wildcard sources/config*.yaml)
+#
+# build, test, qa, proof, images and update are shared by every rv font repo: they
+# come from font-tools (https://github.com/q78717/font-tools), whose `rvfont makefile`
+# writes them to .rvfont.mk from the version pinned in requirements.txt.
+FAMILY = Vektra
+SOURCES = sources/build_vektra.py sources/build_specimen.py sources/specimen_template.html $(wildcard sources/config*.yaml)
+GF_FONTS = fonts/ttf/Vektra-Regular.ttf
+UNIVERSAL_FONTS = 
+
+# One build venv shared by all the font repos: ../.venv-fonts when it exists, else
+# ./venv (what CI uses). Same for the FontBakery venv: ../.venv-fonts-qa or ./venv-test.
+FONT_VENV ?= $(if $(wildcard ../.venv-fonts/bin/python),../.venv-fonts,venv)
+FONT_QA_VENV ?= $(if $(wildcard ../.venv-fonts-qa/bin/python),../.venv-fonts-qa,venv-test)
+override FONT_VENV := $(abspath $(FONT_VENV))
+override FONT_QA_VENV := $(abspath $(FONT_QA_VENV))
 
 help:
 	@echo "###"
@@ -15,49 +28,25 @@ help:
 	@echo "  make proof:  Creates HTML proof documents in the out/proof/ directory"
 	@echo "  make images: Creates PNG specimen images in the documentation/ directory"
 	@echo
+	@echo "  venv: $(FONT_VENV)"
+	@echo
 
-build: build.stamp
+venv: $(FONT_VENV)/touchfile
 
-venv: venv/touchfile
+$(FONT_VENV)/touchfile: requirements.txt
+	test -d $(FONT_VENV) || python3 -m venv $(FONT_VENV)
+	$(FONT_VENV)/bin/pip install -Ur requirements.txt
+	touch $@
 
-build.stamp: venv $(SOURCES)
-	rm -rf fonts
-	./sources/build.sh && touch build.stamp
-
-venv/touchfile: requirements.txt
-	test -d venv || python3 -m venv venv
-	./venv/bin/pip install -Ur requirements.txt
-	touch venv/touchfile
-
-test: build.stamp
-	which fontspector || (echo "fontspector not found. Please install it with 'cargo binstall fontspector'." && exit 1)
-	mkdir -p out/ out/fontspector
-	fontspector --profile googlefonts -l warn --full-lists --succinct --html out/fontspector/fontspector-report.html --ghmarkdown out/fontspector/fontspector-report.md --badges out/badges fonts/ttf/Vektra-Regular.ttf || echo '::warning file=sources/config.yaml,title=fontspector failures::The fontspector QA check reported errors in Vektra. Please check the generated report.'
-
-qa: build.stamp
-	test -d venv-test || (python3 -m venv venv-test && ./venv-test/bin/pip install -Ur requirements-qa.txt)
-	./venv-test/bin/fontbakery check-googlefonts fonts/ttf/Vektra-Regular.ttf
-	./venv-test/bin/fontbakery check-universal fonts/ttf/Vektra-Regular.ttf
-
-proof: venv build.stamp
-	which diff3proof || (echo "diff3proof not found. Please install it with 'cargo binstall diffenator3'." && exit 1)
-	mkdir -p out/ out/proof; for f in fonts/ttf/*.ttf; do diff3proof $$f --output out/proof/$$(basename $$f .ttf); done
-
-images: venv build.stamp
-	./venv/bin/python3 sources/tools/readme_images.py
+.rvfont.mk: $(FONT_VENV)/touchfile
+	$(FONT_VENV)/bin/rvfont makefile > $@
 
 clean:
-	rm -rf venv build.stamp out
-	find . -name "*.pyc" -delete
+	rm -rf venv build.stamp out .rvfont.mk
+	find . -name "*.pyc" -not -path "*/venv*" -delete
 
-update: venv
-	venv/bin/pip install --upgrade pip-tools
-	# See https://pip-tools.readthedocs.io/en/latest/#a-note-on-resolvers for
-	# the `--resolver` flag below.
-	venv/bin/pip-compile --upgrade --verbose --resolver=backtracking requirements.in
-	venv/bin/pip-sync requirements.txt
+ifneq ($(filter-out help venv clean,$(MAKECMDGOALS)),)
+include .rvfont.mk
+endif
 
-	git commit -m "Update requirements" requirements.txt
-	git push
-
-.PHONY: help build venv test qa proof images clean update
+.PHONY: help venv clean

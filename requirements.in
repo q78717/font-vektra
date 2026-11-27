@@ -13,3 +13,5 @@ uharfbuzz>=0.57.0
 # for `make images`
 freetype-py>=2.3.0
 Pillow>=12.3.0
+# proofs, README images, specimen filling and QA checks (not needed to compile the fonts)
+rv-font-tools @ git+https://github.com/q78717/font-tools@v0.1.0

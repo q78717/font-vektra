@@ -4,13 +4,11 @@
 Usage: python3 sources/build_specimen.py [--fonts fonts/webfonts] [--ttf fonts/ttf] [--out documentation/specimen/index.html]
 """
 import argparse
-import base64
-import json
 import os
-import plistlib
 import sys
 
 from fontTools.pens.svgPathPen import SVGPathPen
+from rvfont import specimen
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -56,30 +54,24 @@ def main():
     ap.add_argument("--out", default="documentation/specimen/index.html")
     a = ap.parse_args()
 
-    kplist = os.path.join(HERE, "ufo", f"{B.FAMILY}-Regular.ufo", "kerning.plist")
-    with open(kplist, "rb") as fh:
-        pairs = sum(len(v) for v in plistlib.load(fh).values())
-
+    pairs = specimen.kern_pairs(os.path.join(HERE, "ufo", f"{B.FAMILY}-Regular.ufo"))
     glist = glyph_data()
     meta = {"UPM": B.UPM, "CAP": B.CAP, "XH": B.XH, "W": B.W, "glyphs": len(glist), "kern": pairs}
     data = {"meta": meta, "glyphs": glist}
 
-    t = open(a.template, encoding="utf-8").read()
-    with open(os.path.join(a.fonts, f"{B.FAMILY}-Regular.woff2"), "rb") as fh:
-        woff_b64 = base64.b64encode(fh.read()).decode()
-    t = (
-        t.replace("__FONT_REGULAR__", woff_b64)
-        .replace("__GLYPH_DATA__", json.dumps(data, separators=(",", ":"), ensure_ascii=False))
-        .replace("__VERSION__", B.VERSION)
-        .replace("__REPO__", B.REPO_URL)
-        .replace("__KERN__", f"{pairs:,}")
-        .replace("__CHARS__", str(meta["glyphs"]))
+    size = specimen.fill(
+        a.template,
+        a.out,
+        fonts={"__FONT_REGULAR__": os.path.join(a.fonts, f"{B.FAMILY}-Regular.woff2")},
+        values={
+            "__GLYPH_DATA__": specimen.to_json(data, ensure_ascii=False),
+            "__VERSION__": B.VERSION,
+            "__REPO__": B.REPO_URL,
+            "__KERN__": f"{pairs:,}",
+            "__CHARS__": meta["glyphs"],
+        },
     )
-    os.makedirs(os.path.dirname(a.out), exist_ok=True)
-    with open(a.out, "w", encoding="utf-8") as fh:
-        fh.write(t)
-    print(f"specimen -> {a.out} ({len(t):,} bytes, {len(glist)} glyphs, {pairs:,} kern pairs)")
-
+    print(f"specimen -> {a.out} ({size:,} bytes, {len(glist)} glyphs, {pairs:,} kern pairs)")
 
 if __name__ == "__main__":
     main()

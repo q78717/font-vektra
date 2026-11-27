@@ -5,11 +5,12 @@
 #   3. a STAT table is added, the specimen page is rebuilt, and the font is smoke-tested
 set -euo pipefail
 cd "$(dirname "$0")/.."
-if [ -d "venv/bin" ]; then
-  export PATH="$PWD/venv/bin:$PATH"
-fi
+# Build venv: $FONT_VENV (set by make), else the shared ../.venv-fonts, else ./venv.
+for v in "${FONT_VENV:-}" "$PWD/../.venv-fonts" "$PWD/venv"; do
+  if [ -n "$v" ] && [ -x "$v/bin/python3" ]; then export PATH="$v/bin:$PATH"; break; fi
+done
 python3 sources/build_vektra.py --ufo sources/ufo
 (cd sources && gftools builder config.yaml)
 python3 sources/tools/add_stat.py fonts/ttf fonts/webfonts
 python3 sources/build_specimen.py --fonts fonts/webfonts --ttf fonts/ttf --out documentation/specimen/index.html
-python3 sources/tools/check_font.py fonts/ttf/Vektra-Regular.ttf
+rvfont check-font fonts/ttf/Vektra-Regular.ttf --glyphset GF_Latin_Core
