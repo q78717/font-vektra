@@ -702,7 +702,11 @@ def lc_x(g):
 
 @glyph("y", 0x79)
 def lc_y(g):
-    g.line((0, 480), (250, 0))
+    # The short arm stops on the long arm's centre line, so its flat cap sits inside
+    # the long arm. Running it to (250, 0) left the cap corner poking out as a spur
+    # with an off-baseline point at y = 2.
+    s = 480 * 480 / (680 * 250 + 370 * 480)   # where the two centre lines cross
+    g.line((0, 480), (480 - 370 * s, 480 - 680 * s))
     g.line((480, 480), (110, -200))
 
 

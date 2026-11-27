@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Smoke test for a built Vektra font. Exits non-zero on any failure.
 
-Checks: Google Fonts Latin Core coverage, every printing glyph has ink, dotless i/j
+Checks: Google Fonts Latin Core coverage, every printing glyph has ink, on-curve
+points near vertical zones, dotless i/j
 substitution before top marks, mark attachment, kerning, and vertical metrics.
 Usage: check_font.py fonts/ttf/Vektra-Regular.ttf
 """
@@ -10,6 +11,7 @@ import unicodedata
 
 import uharfbuzz as hb
 from fontTools.pens.boundsPen import BoundsPen
+from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.ttLib import TTFont
 
 FAILS = []
@@ -53,6 +55,24 @@ def main(path):
         if bp.bounds is None:
             blank.append(f"U+{cp:04X}")
     check(not blank, "printing characters with no outline: " + " ".join(blank))
+
+    # On-curve points within 2 units of a vertical zone are almost always merge debris.
+    # Mirrors FontBakery's outline_alignment_miss: baseline, typo ascender/descender,
+    # cap height, and x-height (lowercase letters only).
+    os2 = tt["OS/2"]
+    zones = (0, os2.sTypoAscender, os2.sTypoDescender, os2.sCapHeight)
+    lower = {n for cp, n in cmap.items() if unicodedata.category(chr(cp)) == "Ll"}
+    near_miss = []
+    for name in sorted(set(cmap.values())):
+        rp = DecomposingRecordingPen(gs)
+        gs[name].draw(rp)
+        lines = zones + ((os2.sxHeight,) if name in lower else ())
+        for op, args in rp.value:
+            if op in ("moveTo", "lineTo", "qCurveTo", "curveTo") and args and args[-1]:
+                x, y = args[-1]
+                if any(0 < abs(y - z) <= 2 for z in lines):
+                    near_miss.append(f"{name}@({x:.0f},{y:.0f})")
+    check(not near_miss, "on-curve points just off a vertical zone: " + " ".join(near_miss))
 
     font = hb.Font(hb.Face(hb.Blob.from_file_path(path)))
     # No precomposed forms exist for these, so HarfBuzz must use ccmp and mark attachment.
