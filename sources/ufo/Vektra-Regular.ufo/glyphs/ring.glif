@@ -14,14 +14,10 @@
       <point x="230" y="599"/>
     </contour>
     <contour>
-      <point x="178" y="621"/>
-      <point x="158" y="601"/>
-      <point x="130" y="601"/>
-      <point x="110" y="621"/>
-      <point x="110" y="649"/>
-      <point x="130" y="669"/>
-      <point x="158" y="669"/>
-      <point x="178" y="649"/>
+      <point x="178" y="601"/>
+      <point x="110" y="601"/>
+      <point x="110" y="669"/>
+      <point x="178" y="669"/>
     </contour>
   </outline>
 </glyph>

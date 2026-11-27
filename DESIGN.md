@@ -12,10 +12,10 @@ Vektra is a minimal geometric sci-fi display typeface built from lines, angles, 
 
 ## 3. Technical Architecture
 - **Skeletons**: Glyphs are lists of strokes. A stroke mixes points and `Arc(cx, cy, r, a0, a1)` nodes, and consecutive nodes are joined by straight segments.
-- **Monoline Expansion** (`stroke_outline`): A line segment becomes a rectangle of width `W = 60` with flat caps. An arc becomes an annular sector, made from concentric arcs at `r ± 30`, so offsets are exact. Arcs are written as quadratic curves split every 45°, aligned to the axes, which gives every curve on-curve points at its extremes.
+- **Monoline Expansion** (`stroke_outline`): A line segment becomes a rectangle of width `W = 60` with flat caps. An arc becomes an annular sector, made from concentric arcs at `r ± 30`, so offsets are exact. Arcs are written as quadratic curves split every 45°, aligned to the axes, which gives every curve on-curve points at its extremes. Tight arcs, whose 45° pieces would be shorter than `MIN_ARC_SEG = 30` units, are split every 90° instead.
 - **Joins**: Where tangents change direction, a mitre wedge fills the outer gap. Wedges with a mitre ratio above `MITRE_LIMIT = 4` become bevels. Tangent line-to-arc joins need no wedge.
 - **Triangular Dots** (`G.tdot`): The period, colon, `i`/`j` dots, dieresis, and dot accents are solid triangles, 200 × 180 units at full size.
-- **Union & Cleanup**: Pieces are unioned with `skia-pathops`. Contours are then rounded, with tiny segments removed and colinear points merged, including across the contour start.
+- **Union & Cleanup**: Pieces are unioned with `skia-pathops`. Contours are then rounded, with tiny segments removed and colinear points merged, including across the contour start. Short quadratic stubs left where two arcs cross (the crotch of `m`) are folded into their smooth neighbour: re-split as two equal arc pieces when both lie on one circle, otherwise merged into one quadratic, and only when the result stays within 1 unit of the original.
 - **Marks & Composites**: There are 16 combining marks with `_top`, `_bottom`, and `_ogonek` anchors. The 151 Latin Core composites are built as components. The `ccmp` feature swaps in dotless `i`/`j` before top marks, and `caroncomb.alt` serves `ď ľ ť Ľ`.
 - **Profile-Based Class Kerning**: `auto_kern()` measures scanline profiles of base glyphs and tightens pairs toward a gap of two sidebearings (about 4,500 pairs). It only tightens pairs, never loosens them.
 

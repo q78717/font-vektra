@@ -49,6 +49,7 @@ W_MARK = 52         # accent stroke weight
 SIDE = 58           # sidebearing
 MITRE_LIMIT = 4.0   # mitre length / half-width above which a join is bevelled
 ARC_STEP = 45.0     # degrees of arc per quadratic segment (aligned to the axes)
+MIN_ARC_SEG = 30.0  # arcs whose 45-degree pieces would be shorter than this use 90-degree pieces
 
 FAMILY = "Vektra"
 VERSION = "2.000"
@@ -158,11 +159,14 @@ def _arc_to(path, arc, r, a0, a1):
     on-curve points at its horizontal and vertical extremes (as Google Fonts expects).
     """
     sgn = 1.0 if a1 > a0 else -1.0
+    # Tight arcs (the inner side of small hooks) would get pieces too short for
+    # FontBakery's outline_short_segments; 90-degree pieces still keep the extremes.
+    st = ARC_STEP if r * math.radians(ARC_STEP) >= MIN_ARC_SEG else 90.0
     cuts = [a0]
-    k = math.floor(a0 / ARC_STEP) + 1 if sgn > 0 else math.ceil(a0 / ARC_STEP) - 1
-    while (k * ARC_STEP - a1) * sgn < -0.5:
-        if abs(k * ARC_STEP - a0) > 8 and abs(k * ARC_STEP - a1) > 8:   # no sliver pieces
-            cuts.append(k * ARC_STEP)
+    k = math.floor(a0 / st) + 1 if sgn > 0 else math.ceil(a0 / st) - 1
+    while (k * st - a1) * sgn < -0.5:
+        if abs(k * st - a0) > 8 and abs(k * st - a1) > 8:   # no sliver pieces
+            cuts.append(k * st)
         k += int(sgn)
     cuts.append(a1)
     for b0, b1 in zip(cuts[:-1], cuts[1:]):
@@ -578,7 +582,9 @@ def lc_d(g):
 
 @glyph("e", 0x65)
 def lc_e(g):
-    g.line((0, 250), (480, 250))
+    # The bar's lower edge (270 - 30) lines up with the arc's flat end at y = 240,
+    # so the right side has no step.
+    g.line((0, 270), (480, 270))
     g.arc(240, 240, 240, 0, 325)
 
 
@@ -1155,7 +1161,9 @@ def gl_dcroat(g):
 @glyph("eth", 0x00F0)
 def gl_eth(g):
     lc_o(g)
-    g.poly([(480, 240), (480, 420), (300, 720)])
+    # The knee sits high enough that the diagonal clears the bowl instead of grazing
+    # it, which would leave a thin sliver (FontBakery outline_jaggy_segments).
+    g.poly([(480, 240), (480, 460), (300, 720)])
     g.line((280, 600), (500, 600))
 
 
@@ -1747,6 +1755,8 @@ def build_glyphs():
 TINY = 6.0
 COLINEAR = 3.0
 SNAP = 2
+STUB = 30.0        # quadratic pieces shorter than this are merged into a smooth neighbour
+STUB_TOL = 1.0     # ...if the merged curve stays within this many units of the original
 
 
 def _colinear(a, b, c):
@@ -1823,8 +1833,136 @@ def _clean_contours(path, dx):
             if _colinear(last, start, first_end):
                 start = first_end
                 merged = merged[1:]
-        if len(merged) >= 2:
-            out.append((start, [(op, pts) for op, pts, _ in merged]))
+        segs = _merge_stubs(start, [(op, pts) for op, pts, _ in merged])
+        if len(segs) >= 2:
+            out.append((start, segs))
+    return out
+
+
+def _quad_pt(p0, c, p1, t):
+    u = 1 - t
+    return (u * u * p0[0] + 2 * u * t * c[0] + t * t * p1[0],
+            u * u * p0[1] + 2 * u * t * c[1] + t * t * p1[1])
+
+
+def _line_x(p, d, q, e):
+    """Intersection of the lines p + s*d and q + t*e, as (point, s, t), or None."""
+    den = d[0] * e[1] - d[1] * e[0]
+    if abs(den) < 1e-9:
+        return None
+    s = ((q[0] - p[0]) * e[1] - (q[1] - p[1]) * e[0]) / den
+    t = ((q[0] - p[0]) * d[1] - (q[1] - p[1]) * d[0]) / den
+    return (p[0] + s * d[0], p[1] + s * d[1]), s, t
+
+
+def _merge_stubs(start, segs):
+    """Fold short quadratic stubs left by the boolean union into a smooth neighbour.
+
+    Where two arcs cross just past a split point (the crotch of m, for example), the
+    union leaves a few-unit quadratic piece. If it continues its neighbour smoothly,
+    the pair is redrawn: as two equal pieces when both lie on one circle, otherwise as
+    one quadratic through the outer tangents. The result must stay within STUB_TOL of
+    the old pair.
+    """
+    if start is None:
+        return segs
+    # Expand to single pieces: ("L", end) or ("Q", ctrl, end, end_is_implied).
+    q = []
+    for op, pts in segs:
+        if op == "lineTo":
+            q.append(["L", None, pts[-1], False])
+            continue
+        offs, end = pts[:-1], pts[-1]
+        if end is None:
+            return segs
+        for i, c in enumerate(offs):
+            if i < len(offs) - 1:
+                n = offs[i + 1]
+                q.append(["Q", c, ((c[0] + n[0]) / 2.0, (c[1] + n[1]) / 2.0), True])
+            else:
+                q.append(["Q", c, end, False])
+
+    def begin(i):
+        return q[i - 1][2] if i > 0 else start
+
+    def try_merge(i):
+        """Merge pieces i and i + 1 (both quadratic) if that is safe."""
+        a, b = q[i], q[i + 1]
+        p0, p1, p2 = begin(i), a[2], b[2]
+        d0 = (a[1][0] - p0[0], a[1][1] - p0[1])
+        d1 = (b[1][0] - p2[0], b[1][1] - p2[1])
+        t_in = math.atan2(p1[1] - a[1][1], p1[0] - a[1][0])
+        t_out = math.atan2(b[1][1] - p1[1], b[1][0] - p1[0])
+        if abs((math.degrees(t_out - t_in) + 180) % 360 - 180) > 6:   # not smooth
+            return False
+        hit = _line_x(p0, d0, p2, d1)
+        if hit is None or hit[1] <= 0 or hit[2] <= 0:
+            return False
+        c = hit[0]
+        # If both ends sit on one circle (tangent lines of equal length), re-split the
+        # whole arc into two equal pieces instead of one wide quadratic.
+        la, lb = math.dist(p0, c), math.dist(p2, c)
+        pieces = [(c, p2)]
+        if abs(la - lb) < 1.5 and math.dist(p0, p2) >= 2 * STUB:
+            half = math.acos(max(-1.0, min(1.0, (d0[0] * -d1[0] + d0[1] * -d1[1]) /
+                                           (math.hypot(*d0) * math.hypot(*d1))))) / 4.0
+            r = (la + lb) / 2.0 / math.tan(2 * half)
+            nrm = (-d0[1] / math.hypot(*d0), d0[0] / math.hypot(*d0))
+            centre = None
+            for sgn in (1, -1):
+                o = (p0[0] + sgn * r * nrm[0], p0[1] + sgn * r * nrm[1])
+                if abs(math.dist(o, p2) - r) < 1.5:
+                    centre = o
+            if centre is not None:
+                a0 = math.atan2(p0[1] - centre[1], p0[0] - centre[0])
+                a2 = math.atan2(p2[1] - centre[1], p2[0] - centre[0])
+                da = (a2 - a0 + math.pi) % (2 * math.pi) - math.pi
+                am = a0 + da / 2
+                m = (centre[0] + r * math.cos(am), centre[1] + r * math.sin(am))
+                k = r / math.cos(da / 4)
+                c1 = (centre[0] + k * math.cos(a0 + da / 4), centre[1] + k * math.sin(a0 + da / 4))
+                c2 = (centre[0] + k * math.cos(am + da / 4), centre[1] + k * math.sin(am + da / 4))
+                pieces = [(c1, m), (c2, p2)]
+        pieces = [((round(cc[0]), round(cc[1])), (round(e[0]), round(e[1]))) for cc, e in pieces]
+        new, here = [], p0
+        for cc, e in pieces:
+            new += [_quad_pt(here, cc, e, k / 64.0) for k in range(65)]
+            here = e
+        old = [_quad_pt(p0, a[1], p1, k / 16.0) for k in range(17)] + \
+              [_quad_pt(p1, b[1], p2, k / 16.0) for k in range(17)]
+        if max(min(math.hypot(o[0] - n[0], o[1] - n[1]) for n in new) for o in old) > STUB_TOL:
+            return False
+        if i > 0 and q[i - 1][3]:
+            q[i - 1][2] = (round(p0[0]), round(p0[1]))   # the start is no longer implied
+            q[i - 1][3] = False
+        q[i:i + 2] = [["Q", cc, e, False] for cc, e in pieces]
+        return True
+
+    changed = True
+    while changed:
+        changed = False
+        for i, piece in enumerate(q):
+            if piece[0] != "Q":
+                continue
+            p0 = begin(i)
+            if math.hypot(piece[2][0] - p0[0], piece[2][1] - p0[1]) >= STUB:
+                continue
+            if (i > 0 and q[i - 1][0] == "Q" and try_merge(i - 1)) or \
+               (i + 1 < len(q) and q[i + 1][0] == "Q" and try_merge(i)):
+                changed = True
+                break
+
+    out, offs = [], []
+    for kind, c, end, implied in q:
+        if kind == "L":
+            out.append(("lineTo", [end]))
+            continue
+        offs.append(c)
+        if not implied:
+            out.append(("qCurveTo", offs + [end]))
+            offs = []
+    if offs:   # an implied point cannot end the contour; keep the original segments
+        return segs
     return out
 
 
