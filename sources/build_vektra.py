@@ -52,7 +52,7 @@ ARC_STEP = 45.0     # degrees of arc per quadratic segment (aligned to the axes)
 MIN_ARC_SEG = 30.0  # arcs whose 45-degree pieces would be shorter than this use 90-degree pieces
 
 FAMILY = "Vektra"
-VERSION = "2.000"
+VERSION = "2.100"
 REPO_URL = "https://github.com/q78717/font-vektra"
 COPYRIGHT = f"Copyright 2026 The Vektra Project Authors ({REPO_URL})"
 

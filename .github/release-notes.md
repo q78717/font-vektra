@@ -1,19 +1,16 @@
-**Vektra 2.000** is ready for Google Fonts.
+**Vektra 2.100** cleans up outlines ahead of the Google Fonts submission.
 
-**New**
-- Full Google Fonts Latin Core character set: the Latin languages of Northern, Western, Central, and Eastern Europe, with curly quotes, guillemets, dashes, currency signs, and combining accents
-- True circular arcs: curves are exact concentric offsets written as quadratic curves, replacing the faceted polyline approximation
-- Solid triangular dots for punctuation, i/j, umlauts, and dot accents
-- Class kerning measured from glyph profiles across all base and accented letters
+**Changed**
+- `e` (and `é è ê ë ě ę æ œ`): the crossbar sits 20 units higher, so its lower edge lines up with the arc's flat end and the small step on the right side is gone
+- `ð`: the knee is higher, so the diagonal clears the bowl instead of leaving a thin sliver against it
 
 **Fixed**
-- Round capitals (C, G, O, Q, U) and the figures 0 and 2 no longer overshoot to 800/−100 units; they now match the flat capitals
-- Parentheses now span the full cap and descender range, and the question mark's hook joins its stem
-- Font names, copyright, vertical metrics, `.notdef`, `gasp`, `fsSelection`, and code pages meet the Google Fonts specification
+- `m`: the crotch between the arches no longer has tiny leftover curve pieces
+- `@`, `˚`, `˜`, `¸`, `˛`, `§`: tight arcs are drawn with fewer, longer curve pieces (shape change of 3 units or less)
+- FontBakery's Google Fonts profile reports no outline warnings (alignment, short segments, jaggy joins); 0 FAILs
 
 **Under the hood**
-- Built with Google's toolchain: `sources/build_vektra.py` writes the UFO source and `gftools builder` compiles and hints it
-- FontBakery's Google Fonts profile passes with 0 FAILs
+- `sources/tools/check_font.py` now fails the build on off-zone points, short segments, and jaggy joins, using FontBakery's rules
 
 **What's in the zip**
 - `ttf/`: `Vektra-Regular.ttf` for desktop apps
