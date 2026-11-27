@@ -13,4 +13,4 @@ python3 sources/build_vektra.py --ufo sources/ufo
 (cd sources && gftools builder config.yaml)
 python3 sources/tools/add_stat.py fonts/ttf fonts/webfonts
 python3 sources/build_specimen.py --fonts fonts/webfonts --ttf fonts/ttf --out documentation/specimen/index.html
-rvfont check-font fonts/ttf/Vektra-Regular.ttf --glyphset GF_Latin_Core
+font-tools check-font fonts/ttf/Vektra-Regular.ttf --glyphset GF_Latin_Core

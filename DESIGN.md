@@ -7,7 +7,7 @@ Vektra is a minimal geometric sci-fi display typeface built from lines, angles, 
 - **Language**: Python 3.10+
 - **Outline Synthesis & Boolean Geometry**: `skia-pathops`, `fontTools`, `ufoLib2`, `numpy`
 - **Font Compilation & Hinting**: `gftools builder`, `fontmake`, `ufo2ft`, `ttfautohint-py`
-- **Quality Assurance**: `FontBakery` (`googlefonts` profile) / `fontspector`, `rvfont check-font` from [font-tools](https://github.com/q78717/font-tools)
+- **Quality Assurance**: `FontBakery` (`googlefonts` profile) / `fontspector`, `font-tools check-font` from [font-tools](https://github.com/q78717/font-tools)
 - **License**: SIL Open Font License 1.1 (`OFL.txt`)
 
 ## 3. Technical Architecture
@@ -25,7 +25,7 @@ font-vektra/
 ├── .github/workflows/            # CI build/test, GitHub Pages specimen, Release packaging
 ├── AUTHORS.txt / CONTRIBUTORS.txt
 ├── DESIGN.md                     # This document
-├── Makefile                      # help, venv, clean; build, test, qa, proof, images, update from font-tools (.rvfont.mk)
+├── Makefile                      # help, venv, clean; build, test, qa, proof, images, update from font-tools (.font-tools.mk)
 ├── OFL.txt                       # SIL Open Font License 1.1
 ├── README.md
 ├── requirements.in / requirements.txt / requirements-qa.txt

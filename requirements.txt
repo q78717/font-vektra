@@ -48,6 +48,8 @@ filelock==4.2.6
     # via
     #   gftools
     #   youseedee
+font-tools @ git+https://github.com/q78717/font-tools@v0.2.0
+    # via -r requirements.in
 fontfeatures==1.9.0
     # via gftools
 fontmake==3.12.2
@@ -193,8 +195,6 @@ rich==15.0.0
     # via gftools
 ruamel-yaml==0.19.1
     # via gftools
-rv-font-tools @ git+https://github.com/q78717/font-tools@v0.1.0
-    # via -r requirements.in
 skia-pathops==0.9.2
     # via
     #   -r requirements.in

@@ -2,10 +2,10 @@
 """Render the README and article images in documentation/ from the built font (`make images`)."""
 import os
 
-from rvfont.grid import grid, printing_chars
-from rvfont.palette import DENIM, RED
-from rvfont.raster import line as _line
-from rvfont.raster import save_rows
+from font_tools.grid import grid, printing_chars
+from font_tools.palette import DENIM, RED
+from font_tools.raster import line as _line
+from font_tools.raster import save_rows
 
 F = "fonts/ttf/Vektra-Regular.ttf"
 OUT = "documentation/images"

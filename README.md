@@ -56,7 +56,7 @@ make images   # redraws the PNG images in documentation/
 2. It compiles `sources/config.yaml` into `fonts/ttf/` and `fonts/webfonts/`.
 3. It adds a `STAT` table.
 4. It rebuilds `documentation/specimen/index.html`.
-5. It runs `rvfont check-font` (from [font-tools](https://github.com/q78717/font-tools)), a smoke test for Latin Core coverage, blank glyphs, outline quality (points just off a vertical zone, short segments, jaggy joins; the same rules as FontBakery), dotless `i`/`j` substitution, mark attachment, kerning, and vertical metrics.
+5. It runs `font-tools check-font` (from [font-tools](https://github.com/q78717/font-tools)), a smoke test for Latin Core coverage, blank glyphs, outline quality (points just off a vertical zone, short segments, jaggy joins; the same rules as FontBakery), dotless `i`/`j` substitution, mark attachment, kerning, and vertical metrics.
 
 Dependencies are listed in `requirements.in`, and `make update` regenerates the pinned `requirements.txt`. FontBakery uses a separate environment built from `requirements-qa.txt`.
 

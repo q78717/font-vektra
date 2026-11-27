@@ -8,7 +8,7 @@ import os
 import sys
 
 from fontTools.pens.svgPathPen import SVGPathPen
-from rvfont import specimen
+from font_tools import specimen
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
