@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   release:
-    uses: q78717/font-tools/.github/workflows/release.yml@v0.2.0
+    uses: q78717/font-tools/.github/workflows/release.yml@v0.3.0
     with:
       family: Vektra
       version: ${{ inputs.version || github.ref_name }}

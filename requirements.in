@@ -14,4 +14,4 @@ uharfbuzz>=0.57.0
 freetype-py>=2.3.0
 Pillow>=12.3.0
 # proofs, README images, specimen filling and QA checks (not needed to compile the fonts)
-font-tools @ git+https://github.com/q78717/font-tools@v0.2.0
+font-tools @ git+https://github.com/q78717/font-tools@v0.3.0

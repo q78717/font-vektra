@@ -19,4 +19,4 @@ concurrency:
 
 jobs:
   pages:
-    uses: q78717/font-tools/.github/workflows/pages.yml@v0.2.0
+    uses: q78717/font-tools/.github/workflows/pages.yml@v0.3.0
